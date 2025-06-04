@@ -5,6 +5,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Models\Game;
 use App\Http\Controllers\TicketController;
+use App\Http\Controllers\AuthController;
+use App\Http\Controllers\UserController;
 
 
 /*
@@ -42,4 +44,16 @@ Route::get('/tickets', [TicketController::class, 'index']);              // get 
 Route::get('/tickets/user/{userId}', [TicketController::class, 'getTicketsByUser']);      // it will give the tickets of the user by giving user id
 
 Route::get('/tickets/{id}', [TicketController::class, 'show']);          // get the ticket by ticket id
+
+Route::post('/register', [AuthController::class, 'register']);
+
+Route::post('/login', [AuthController::class, 'login']);
+
+Route::middleware('auth:api')->post('/update-password', [\App\Http\Controllers\AuthController::class, 'updatePassword']);
+
+Route::put('/user/update', [UserController::class, 'updateProfile']);
+
+Route::post('/logout', [AuthController::class, 'logout']);
+
+Route::delete('/user', [App\Http\Controllers\UserController::class, 'deleteUser']);
 
