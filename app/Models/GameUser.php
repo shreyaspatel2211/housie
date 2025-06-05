@@ -8,4 +8,23 @@ use Illuminate\Database\Eloquent\Model;
 class GameUser extends Model
 {
     use HasFactory;
+
+    protected $table = 'gameusers';  
+
+
+    protected $fillable = [
+        'game_id',
+        'user_id',
+        'no_of_tickets',
+    ];
+
+    public function game()
+    {
+        return $this->belongsTo(Game::class);
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 }

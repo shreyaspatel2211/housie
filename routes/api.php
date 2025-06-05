@@ -6,7 +6,10 @@ use Illuminate\Support\Facades\Route;
 use App\Models\Game;
 use App\Http\Controllers\TicketController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\TicketGenerator;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\WinnerHistoryController;
+use App\Http\Controllers\SimplePasswordResetController;
 
 
 /*
@@ -31,9 +34,8 @@ Route::get('/game-winners/{id}', function ($id) {
         'winner_for_other_categories' => $game->winner_for_other_categories,
     ]);
 });
-Route::middleware('auth:api')->group(function () {
-    Route::get('/games', [GameController::class, 'index']);
-});                                                                        // get all the games
+Route::get('/games', [GameController::class, 'index']);
+// get all the games
 
 Route::get('/games/today', [GameController::class, 'getTodayGames']);    // get all the games of today
 
@@ -56,4 +58,15 @@ Route::put('/user/update', [UserController::class, 'updateProfile']);
 Route::post('/logout', [AuthController::class, 'logout']);
 
 Route::delete('/user', [App\Http\Controllers\UserController::class, 'deleteUser']);
+
+Route::get('/winners', [WinnerHistoryController::class, 'index']);
+
+Route::get('/winner-history/{user_id}', [WinnerHistoryController::class, 'getWinnerHistory']);
+
+Route::post('/refresh-token', [AuthController::class, 'refresh']);
+
+Route::post('/generate-tickets', [TicketGenerator::class, 'generate']);
+
+Route::post('/send-reset-link', [SimplePasswordResetController::class, 'sendResetLink']);
+Route::post('/forgotten-update-password', [SimplePasswordResetController::class, 'updatePassword']);
 

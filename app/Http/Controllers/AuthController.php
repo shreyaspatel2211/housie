@@ -8,14 +8,15 @@ use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Tymon\JWTAuth\Facades\JWTAuth;
-use Illuminate\Support\Facades\Auth; // ✅ REQUIRED
+use Illuminate\Support\Facades\Auth;
+use Exception;
+use Tymon\JWTAuth\Exceptions\JWTException;
 
 
 class AuthController extends Controller
 {
-   public function register(Request $request)
+    public function register(Request $request)
     {
-        // Validate incoming request
         $validator = Validator::make($request->all(), [
             'username' => 'required|string|unique:users,username',
             'name' => 'required|string',
@@ -26,10 +27,14 @@ class AuthController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors()], 422);
+            $firstErrorMessage = $validator->errors()->first();
+
+            return response()->json([
+                'status' => 'error',
+                'message' => $firstErrorMessage
+            ], 422);
         }
 
-        // Create and save user
         $user = User::create([
             'username' => $request->username,
             'name' => $request->name,
@@ -38,7 +43,6 @@ class AuthController extends Controller
             'password' => Hash::make($request->password),
         ]);
 
-        // Generate JWT token
         $token = JWTAuth::fromUser($user);
 
         return response()->json([
@@ -49,12 +53,12 @@ class AuthController extends Controller
     }
 
 
-public function login(Request $request)
+    public function login(Request $request)
     {
         $credentials = $request->only('email_or_phone', 'password');
 
-        $loginField = filter_var($credentials['email_or_phone'], FILTER_VALIDATE_EMAIL) ? 'email' : 'phone_number';
-        
+        $loginField = filter_var($credentials['email_or_phone'], FILTER_VALIDATE_EMAIL) ? 'email' : 'phone_no';
+
         $user = User::where($loginField, $credentials['email_or_phone'])->first();
 
         if (!$user) {
@@ -63,7 +67,7 @@ public function login(Request $request)
                 'message' => 'User not found.'
             ], 404);
         }
-        
+
         $credentials = [
             $loginField => $credentials['email_or_phone'],
             'password' => $credentials['password']
@@ -89,7 +93,7 @@ public function login(Request $request)
             ], 500);
         }
         $refreshToken = JWTAuth::fromUser(auth()->user(), ['exp' => strtotime('+1 week')]);
-       
+
         return response()->json([
             'status' => 'success',
             'message' => 'Login successful',
@@ -101,45 +105,50 @@ public function login(Request $request)
         ]);
     }
 
-public function updatePassword(Request $request)
-{
-    $request->validate([
-        'current_password' => 'required|string',
-        'new_password' => 'required|string|min:6|confirmed',
-    ]);
 
-    // Ensure the user is authenticated via JWT
-    $user = Auth::guard('api')->user();
-
-    if (!$user) {
-        return response()->json([
-            'message' => 'Unauthorized'
-        ], 401);
-    }
-
-    if (!Hash::check($request->current_password, $user->password)) {
-        return response()->json([
-            'message' => 'Current password is incorrect'
-        ], 400);
-    }
-
-    $user->password = Hash::make($request->new_password);
-    $user->save();
-
-    return response()->json([
-        'message' => 'Password updated successfully'
-    ], 200);
-}
-
- public function updateProfile(Request $request)
+    public function updatePassword(Request $request)
     {
+        $user = JWTAuth::parseToken()->authenticate();
+
+        if (!$user) {
+            return response()->json(['error' => 'User not authenticated'], 401);
+        }
+
+        $request->validate([
+            'current_password' => 'required|string',
+            'new_password' => 'required|string|min:6|confirmed',
+        ]);
+
         $user = Auth::guard('api')->user();
 
         if (!$user) {
-            return response()->json(['message' => 'Unauthorized'], 401);
+            return response()->json([
+                'message' => 'Unauthorized'
+            ], 401);
         }
 
-        // Validate input
+        if (!Hash::check($request->current_password, $user->password)) {
+            return response()->json([
+                'message' => 'Current password is incorrect'
+            ], 400);
+        }
+
+        $user->password = Hash::make($request->new_password);
+        $user->save();
+
+        return response()->json([
+            'message' => 'Password updated successfully'
+        ], 200);
+    }
+
+    public function updateProfile(Request $request)
+    {
+        $user = JWTAuth::parseToken()->authenticate();
+
+        if (!$user) {
+            return response()->json(['error' => 'User not authenticated'], 401);
+        }
+
         $validator = Validator::make($request->all(), [
             'name'     => 'sometimes|string|max:255',
             'email'    => 'sometimes|email|unique:users,email,' . $user->id,
@@ -153,7 +162,6 @@ public function updatePassword(Request $request)
             ], 422);
         }
 
-        // Update the user
         $user->update($request->only(['name', 'email', 'phone_no']));
 
         return response()->json([
@@ -162,17 +170,80 @@ public function updatePassword(Request $request)
         ]);
     }
     public function logout(Request $request)
-{
-    try {
-        JWTAuth::invalidate(JWTAuth::getToken());
+    {
+        $token = $request->header('Authorization');
 
-        return response()->json([
-            'message' => 'Successfully logged out'
-        ]);
-    } catch (\Tymon\JWTAuth\Exceptions\JWTException $e) {
-        return response()->json([
-            'error' => 'Failed to logout, please try again'
-        ], 500);
+        if (!$token) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Token not provided'
+            ], 401);
+        }
+        
+        try {
+            JWTAuth::invalidate(JWTAuth::getToken());
+
+            return response()->json([
+                'message' => 'Successfully logged out'
+            ]);
+        } catch (\Tymon\JWTAuth\Exceptions\JWTException $e) {
+            return response()->json([
+                'error' => 'Failed to logout, please try again'
+            ], 500);
+        }
     }
-}
+
+    public function refresh(Request $request)
+    {
+        $refreshToken = $request->input('refresh_token');
+
+        if (!$refreshToken) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Refresh token not provided'
+            ], 400);
+        }
+
+        try {
+
+            $token = JWTAuth::parseToken()->refresh();
+
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Token refreshed successfully via parsed token',
+                'data' => [
+                    'access_token' => $token,
+                    'refresh_token' => $refreshToken,
+                ],
+            ]);
+        } catch (JWTException $e) {
+
+            try {
+
+                JWTAuth::setToken($refreshToken);
+                $payload = JWTAuth::getPayload($refreshToken);
+                $userId = $payload['sub'];
+
+
+                $user = User::find($userId);
+                $newAccessToken = JWTAuth::refresh($refreshToken);
+                $newRefreshToken = JWTAuth::fromUser($user, ['exp' => strtotime('+1 week')]);
+
+                return response()->json([
+                    'status' => 'success',
+                    'data' => [
+                        'access_token' => $newAccessToken,
+                        'refresh_token' => $newRefreshToken,
+                    ],
+                    'message' => 'Token refreshed successfully using the refresh token',
+                ]);
+            } catch (JWTException $e) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Failed to refresh token: ' . $e->getMessage(),
+                ], 401);
+            }
+        }
+    }
 }

@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use TCG\Voyager\Facades\Voyager;
 
 /*
 |--------------------------------------------------------------------------
@@ -21,3 +22,11 @@ Route::get('/', function () {
 Route::group(['prefix' => 'admin'], function () {
     Voyager::routes();
 });
+
+Route::get('/reset-password-form', function () {
+    return view('reset-password-form');
+});
+
+Route::get('/login', function () {
+    return 'Login page placeholder.';
+})->name('login');   // dummy login route
