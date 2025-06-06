@@ -10,6 +10,7 @@ use App\Http\Controllers\TicketGenerator;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\WinnerHistoryController;
 use App\Http\Controllers\SimplePasswordResetController;
+use App\Http\Controllers\HousieGameController;
 
 
 /*
@@ -61,7 +62,7 @@ Route::delete('/user', [App\Http\Controllers\UserController::class, 'deleteUser'
 
 Route::get('/winners', [WinnerHistoryController::class, 'index']);
 
-Route::get('/winner-history/{user_id}', [WinnerHistoryController::class, 'getWinnerHistory']);
+Route::get('/winner-history', [WinnerHistoryController::class, 'getWinnerHistory']);
 
 Route::post('/refresh-token', [AuthController::class, 'refresh']);
 
@@ -70,3 +71,4 @@ Route::post('/generate-tickets', [TicketGenerator::class, 'generate']);
 Route::post('/send-reset-link', [SimplePasswordResetController::class, 'sendResetLink']);
 Route::post('/forgotten-update-password', [SimplePasswordResetController::class, 'updatePassword']);
 
+Route::post('/store-winning-positions/{winningCondition}', [HousieGameController::class, 'storeWinningPositions']);

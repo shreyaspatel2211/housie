@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use TCG\Voyager\Facades\Voyager;
+use App\Http\Controllers\HousieGameController;
 
 /*
 |--------------------------------------------------------------------------
@@ -30,3 +31,4 @@ Route::get('/reset-password-form', function () {
 Route::get('/login', function () {
     return 'Login page placeholder.';
 })->name('login');   // dummy login route
+

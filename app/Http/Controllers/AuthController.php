@@ -108,38 +108,42 @@ class AuthController extends Controller
 
     public function updatePassword(Request $request)
     {
-        $user = JWTAuth::parseToken()->authenticate();
+        // Attempt to parse and authenticate user via JWT token
+        try {
+            $user = JWTAuth::parseToken()->authenticate();
+        } catch (\Tymon\JWTAuth\Exceptions\JWTException $e) {
+            // Catch JWT exception and handle errors
+            return response()->json(['error' => 'Token is invalid or expired'], 401);
+        }
 
+        // If user is not authenticated
         if (!$user) {
             return response()->json(['error' => 'User not authenticated'], 401);
         }
 
+        // Validate the input request
         $request->validate([
             'current_password' => 'required|string',
             'new_password' => 'required|string|min:6|confirmed',
         ]);
 
-        $user = Auth::guard('api')->user();
-
-        if (!$user) {
-            return response()->json([
-                'message' => 'Unauthorized'
-            ], 401);
-        }
-
+        // Check if the current password matches
         if (!Hash::check($request->current_password, $user->password)) {
             return response()->json([
-                'message' => 'Current password is incorrect'
+                'error' => 'Current password is incorrect'
             ], 400);
         }
 
+        // Update the password
         $user->password = Hash::make($request->new_password);
         $user->save();
 
+        // Return success message
         return response()->json([
             'message' => 'Password updated successfully'
         ], 200);
     }
+
 
     public function updateProfile(Request $request)
     {
