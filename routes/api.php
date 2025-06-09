@@ -69,6 +69,7 @@ Route::post('/refresh-token', [AuthController::class, 'refresh']);
 Route::post('/generate-tickets', [TicketGenerator::class, 'generate']);
 
 Route::post('/send-reset-link', [SimplePasswordResetController::class, 'sendResetLink']);
+
 Route::post('/forgotten-update-password', [SimplePasswordResetController::class, 'updatePassword']);
 
-Route::post('/store-winning-positions/{winningCondition}', [HousieGameController::class, 'storeWinningPositions']);
+Route::post('/store-win/{winningCondition}', [HousieGameController::class, 'storeWinningPositions']);
