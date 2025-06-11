@@ -46,6 +46,7 @@ class AuthController extends Controller
         $token = JWTAuth::fromUser($user);
 
         return response()->json([
+            'status' => 'success',
             'message' => 'User registered successfully',
             'user' => $user,
             'token' => $token
@@ -113,12 +114,17 @@ class AuthController extends Controller
             $user = JWTAuth::parseToken()->authenticate();
         } catch (\Tymon\JWTAuth\Exceptions\JWTException $e) {
             // Catch JWT exception and handle errors
-            return response()->json(['error' => 'Token is invalid or expired'], 401);
+            return response()->json([
+                'status' => 'error',
+                'Message' => 'Token is invalid or expired'], 401);
         }
 
         // If user is not authenticated
         if (!$user) {
-            return response()->json(['error' => 'User not authenticated'], 401);
+            return response()->json([
+                
+                'status' => 'error',
+                'Message' => 'User not authenticated'], 401);
         }
 
         // Validate the input request
@@ -130,7 +136,8 @@ class AuthController extends Controller
         // Check if the current password matches
         if (!Hash::check($request->current_password, $user->password)) {
             return response()->json([
-                'error' => 'Current password is incorrect'
+                'status' => 'error',
+                'Message' => 'Current password is incorrect'
             ], 400);
         }
 
@@ -140,6 +147,8 @@ class AuthController extends Controller
 
         // Return success message
         return response()->json([
+
+            'status' => 'success',
             'message' => 'Password updated successfully'
         ], 200);
     }
@@ -150,7 +159,9 @@ class AuthController extends Controller
         $user = JWTAuth::parseToken()->authenticate();
 
         if (!$user) {
-            return response()->json(['error' => 'User not authenticated'], 401);
+            return response()->json([
+                'status' => 'error',
+                'Mesaage' => 'User not authenticated'], 401);
         }
 
         $validator = Validator::make($request->all(), [
@@ -161,6 +172,7 @@ class AuthController extends Controller
 
         if ($validator->fails()) {
             return response()->json([
+                'status' => 'error',
                 'message' => 'Validation failed',
                 'errors' => $validator->errors()
             ], 422);
@@ -169,6 +181,7 @@ class AuthController extends Controller
         $user->update($request->only(['name', 'email', 'phone_no']));
 
         return response()->json([
+            'status' => 'success',
             'message' => 'Profile updated successfully',
             'user' => $user
         ]);
@@ -188,11 +201,16 @@ class AuthController extends Controller
             JWTAuth::invalidate(JWTAuth::getToken());
 
             return response()->json([
+
+                'status' => 'success',
                 'message' => 'Successfully logged out'
+
             ]);
         } catch (\Tymon\JWTAuth\Exceptions\JWTException $e) {
             return response()->json([
-                'error' => 'Failed to logout, please try again'
+
+                'status' => 'error',
+                'Message' => 'Failed to logout, please try again'
             ], 500);
         }
     }

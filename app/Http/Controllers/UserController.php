@@ -13,7 +13,9 @@ class UserController extends Controller
         $user = Auth::guard('api')->user();
 
         if (!$user) {
-            return response()->json(['message' => 'Unauthorized'], 401);
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Unauthorized'], 401);
         }
 
         $validator = Validator::make($request->all(), [
@@ -23,7 +25,9 @@ class UserController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors()], 422);
+            return response()->json([
+                'status' => 'error',
+                'message' => $validator->errors()], 422);
         }
 
         $user->update($request->only(['name', 'email', 'phone_no']));
@@ -41,6 +45,7 @@ public function deleteUser(Request $request)
 
     if (!$user) {
         return response()->json([
+            'status' => 'error',
             'message' => 'Unauthorized'
         ], 401);
     }
@@ -48,6 +53,7 @@ public function deleteUser(Request $request)
     $user->delete();
 
     return response()->json([
+        'status' => 'success',
         'message' => 'User account deleted successfully'
     ]);
 }

@@ -12,6 +12,7 @@ use App\Http\Controllers\WinnerHistoryController;
 use App\Http\Controllers\SimplePasswordResetController;
 use App\Http\Controllers\HousieGameController;
 use App\Http\Controllers\GameWinnersController;
+use App\Http\Controllers\GameUserController;
 
 
 /*
@@ -46,7 +47,7 @@ Route::get('/games/{id}', [GameController::class, 'show']);              // get 
 
 Route::get('/tickets', [TicketController::class, 'index']);              // get all the tickets
 
-Route::get('/tickets/user/{userId}', [TicketController::class, 'getTicketsByUser']);      // it will give the tickets of the user by giving user id
+Route::middleware('jwt.auth')->get('/tickets', [TicketController::class, 'getTicketsByUser']);      // it will give the tickets of the user by giving user id
 
 Route::get('/tickets/{id}', [TicketController::class, 'show']);          // get the ticket by ticket id
 
@@ -75,6 +76,8 @@ Route::post('/send-reset-link', [SimplePasswordResetController::class, 'sendRese
 Route::post('/forgotten-update-password', [SimplePasswordResetController::class, 'updatePassword']);
 
 Route::post('/store-win/{winningCondition}', [HousieGameController::class, 'storeWinningPositions']);
+
+Route::post('/game-users', [GameUserController::class, 'store']);
 
 Route::post('/game-data', [GameWinnersController::class, 'getGameData']);
 

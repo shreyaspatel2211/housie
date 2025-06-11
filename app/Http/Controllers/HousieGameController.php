@@ -22,7 +22,9 @@ class HousieGameController extends Controller
         $user = JWTAuth::parseToken()->authenticate();
 
         if (!$user) {
-            return response()->json(['error' => 'User not authenticated'], 401);
+            return response()->json([
+                'status' => 'error',
+                'Message' => 'User not authenticated'], 401);
         }
 
         $request->validate([
@@ -34,7 +36,9 @@ class HousieGameController extends Controller
         $validConditions = ['early_five', 'first_row', 'second_row', 'third_row', 'full_house'];
 
         if (!in_array($winningCondition, $validConditions)) {
-            return response()->json(['message' => 'Invalid winning condition'], 400);
+            return response()->json([
+                'status' => 'error',
+                'Message' => 'Invalid winning condition'], 400);
         }
 
         $positions = $request->ticket_json;
@@ -47,14 +51,18 @@ class HousieGameController extends Controller
             case 'early_five':
                 $marked = array_filter($positions, fn($val) => $val === true);
                 if (count($marked) < 5) {
-                    return response()->json(['message' => 'At least 5 marked positions are required for early five.'], 422);
+                    return response()->json([
+                        'status' => 'error',
+                        'message' => 'At least 5 marked positions are required for early five.'], 422);
                 }
                 break;
 
             case 'first_row':
                 foreach ($firstRow as $pos) {
                     if (empty($positions[$pos]) || $positions[$pos] !== true) {
-                        return response()->json(['message' => 'Not all positions in the first row are marked.'], 422);
+                        return response()->json([
+                            'status' => 'error',
+                            'Message' => 'Not all positions in the first row are marked.'], 422);
                     }
                 }
                 break;
@@ -62,7 +70,9 @@ class HousieGameController extends Controller
             case 'second_row':
                 foreach ($secondRow as $pos) {
                     if (empty($positions[$pos]) || $positions[$pos] !== true) {
-                        return response()->json(['message' => 'Not all positions in the second row are marked.'], 422);
+                        return response()->json([
+                            'status' => 'error',
+                            'message' => 'Not all positions in the second row are marked.'], 422);
                     }
                 }
                 break;
@@ -70,7 +80,9 @@ class HousieGameController extends Controller
             case 'third_row':
                 foreach ($thirdRow as $pos) {
                     if (empty($positions[$pos]) || $positions[$pos] !== true) {
-                        return response()->json(['message' => 'Not all positions in the third row are marked.'], 422);
+                        return response()->json([
+                            'status' => 'error',
+                            'message' => 'Not all positions in the third row are marked.'], 422);
                     }
                 }
                 break;
@@ -78,7 +90,9 @@ class HousieGameController extends Controller
             case 'full_house':
                 for ($i = 1; $i <= 27; $i++) {
                     if (empty($positions[$i]) || $positions[$i] !== true) {
-                        return response()->json(['message' => 'All 27 positions must be marked for full housie.'], 422);
+                        return response()->json([
+                            'status' => 'error',
+                            'message' => 'All 27 positions must be marked for full housie.'], 422);
                     }
                 }
                 break;
@@ -92,6 +106,7 @@ class HousieGameController extends Controller
 
         if ($existingClaim) {
             return response()->json([
+                'status' => 'error',
                 'message' => "You have already claimed '$winningCondition' for this ticket.",
             ], 409);
         }
@@ -113,6 +128,7 @@ class HousieGameController extends Controller
         $winnerHistory->save();
 
         return response()->json([
+            'status' => 'success',
             'message' => "$winningCondition claim stored successfully.",
             'data' => $winnerHistory
         ], 201);

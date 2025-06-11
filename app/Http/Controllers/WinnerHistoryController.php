@@ -23,7 +23,9 @@ class WinnerHistoryController extends Controller
         $user = JWTAuth::parseToken()->authenticate();
 
         if (!$user) {
-            return response()->json(['error' => 'User not authenticated'], 401);
+            return response()->json([
+                'status' => 'error',
+                'message' => 'User not authenticated'], 401);
         }
 
         $winners = WinnerHistory::all();
@@ -52,11 +54,15 @@ class WinnerHistoryController extends Controller
 
             // If no user is found, return error
             if (!$user) {
-                return response()->json(['error' => 'User not authenticated'], 401);
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'User not authenticated'], 401);
             }
         } catch (Exception $e) {
             // Catch exceptions and provide a detailed error message if token is invalid
-            return response()->json(['error' => 'Token is invalid: ' . $e->getMessage()], 401);
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Token is invalid: ' . $e->getMessage()], 401);
         }
 
         // Retrieve the winner history based on the authenticated user's ID
@@ -64,7 +70,9 @@ class WinnerHistoryController extends Controller
 
         // If no history found, return a message
         if ($winnerHistory->isEmpty()) {
-            return response()->json(['message' => 'No history found for this user.'], 404);
+            return response()->json([
+                'status' => 'error',
+                'message' => 'No history found for this user.'], 404);
         }
 
         // Return the winner history
