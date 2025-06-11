@@ -79,7 +79,5 @@ Route::post('/store-win/{winningCondition}', [HousieGameController::class, 'stor
 
 Route::post('/game-users', [GameUserController::class, 'store']);
 
-Route::post('/game-data', [GameWinnersController::class, 'getGameData']);
-
 Route::get('/game-winners-top/{game_id}', [GameWinnersController::class, 'getWinners']);
 
