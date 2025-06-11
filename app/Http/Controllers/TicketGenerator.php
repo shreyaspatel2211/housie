@@ -39,6 +39,7 @@ class TicketGenerator extends Controller
         }
 
         return response()->json([
+            'status' => 'success',
             'message' => 'Tickets generated successfully.',
             'total_tickets_generated' => $totalTickets,
             'tickets' => $tickets

@@ -25,7 +25,9 @@ class GameController extends Controller
         $user = JWTAuth::parseToken()->authenticate();
 
         if (!$user) {
-            return response()->json(['error' => 'User not authenticated'], 401);
+            return response()->json([
+                'status' => 'error',
+                'message' => 'User not authenticated'], 401);
         }
 
         $games = Game::all(); 
@@ -39,13 +41,15 @@ class GameController extends Controller
         if (!$token) {
             return response()->json([
                 'status' => 'error',
-                'message' => 'Token not provided'
+                'Message' => 'Token not provided'
             ], 401);
         }
         $user = JWTAuth::parseToken()->authenticate();
 
         if (!$user) {
-            return response()->json(['error' => 'User not authenticated'], 401);
+            return response()->json([
+                'status' => 'error',
+                'Message' => 'User not authenticated'], 401);
         }
 
         $today = \Carbon\Carbon::today()->toDateString();
@@ -66,12 +70,16 @@ class GameController extends Controller
         $user = JWTAuth::parseToken()->authenticate();
 
         if (!$user) {
-            return response()->json(['error' => 'User not authenticated'], 401);
+            return response()->json([
+                'status' => 'error',
+                'Message' => 'User not authenticated'], 401);
         }
 
         $game = Game::find($id);
         if (!$game) {
-            return response()->json(['error' => 'Game not found'], 404);
+            return response()->json([
+                'status' => 'error',
+                'Message' => 'Game not found'], 404);
         }
 
         return response()->json($game);
