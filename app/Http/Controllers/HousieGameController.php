@@ -30,7 +30,7 @@ class HousieGameController extends Controller
         $request->validate([
             'game_id' => 'required|integer',
             'ticket_id' => 'required|integer',
-            'ticket_json' => 'required|array',
+            'ticket_json' => 'required|array',  
         ]);
 
         $validConditions = ['early_five', 'first_row', 'second_row', 'third_row', 'full_house'];

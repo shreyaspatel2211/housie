@@ -76,3 +76,6 @@ Route::post('/forgotten-update-password', [SimplePasswordResetController::class,
 Route::post('/store-win/{winningCondition}', [HousieGameController::class, 'storeWinningPositions']);
 
 Route::post('/game-users', [GameUserController::class, 'store']);
+use App\Http\Controllers\GameWinnersController;
+
+Route::post('/game-data', [GameWinnersController::class, 'getGameData']);
