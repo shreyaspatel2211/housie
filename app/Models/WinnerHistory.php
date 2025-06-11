@@ -24,4 +24,9 @@ class WinnerHistory extends Model
         'third_row' => 'array',
         'full_housie' => 'array',
     ];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 }

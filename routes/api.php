@@ -11,6 +11,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\WinnerHistoryController;
 use App\Http\Controllers\SimplePasswordResetController;
 use App\Http\Controllers\HousieGameController;
+use App\Http\Controllers\GameWinnersController;
 
 
 /*
@@ -35,6 +36,7 @@ Route::get('/game-winners/{id}', function ($id) {
         'winner_for_other_categories' => $game->winner_for_other_categories,
     ]);
 });
+
 Route::get('/games', [GameController::class, 'index']);
 // get all the games
 
@@ -74,6 +76,7 @@ Route::post('/forgotten-update-password', [SimplePasswordResetController::class,
 
 Route::post('/store-win/{winningCondition}', [HousieGameController::class, 'storeWinningPositions']);
 
-use App\Http\Controllers\GameWinnersController;
-
 Route::post('/game-data', [GameWinnersController::class, 'getGameData']);
+
+Route::get('/game-winners-top/{game_id}', [GameWinnersController::class, 'getWinners']);
+
