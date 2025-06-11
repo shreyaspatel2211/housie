@@ -5,19 +5,15 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Transaction extends Model
+class Deposit extends Model
 {
     use HasFactory;
 
-    // Allow mass assignment for these fields
     protected $fillable = [
         'user_id',
         'amount',
-        'description',
-        'type',
     ];
 
-    // Optional: Define relationship to User
     public function user()
     {
         return $this->belongsTo(User::class);

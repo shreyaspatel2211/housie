@@ -12,6 +12,8 @@ use App\Http\Controllers\WinnerHistoryController;
 use App\Http\Controllers\SimplePasswordResetController;
 use App\Http\Controllers\HousieGameController;
 use App\Http\Controllers\GameUserController;
+use App\Http\Controllers\DepositController;
+use App\Http\Controllers\WithdrawalController;
 
 
 /*
@@ -79,3 +81,7 @@ Route::post('/game-users', [GameUserController::class, 'store']);
 use App\Http\Controllers\GameWinnersController;
 
 Route::post('/game-data', [GameWinnersController::class, 'getGameData']);
+
+Route::post('/deposit', [DepositController::class, 'store']);
+
+Route::post('/withdraw', [WithdrawalController::class, 'store']);

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Game;
 use App\Models\GameUser;
+use App\Models\Transaction; // Make sure this model exists
 use Illuminate\Http\Request;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
@@ -48,6 +49,14 @@ class GameUserController extends Controller
         // Deduct balance and save
         $user->balance -= $totalAmount;
         $user->save();
+
+        // Save transaction
+        Transaction::create([
+            'user_id'    => $user->id,
+            'amount'     => $totalAmount,
+            'description'=> 'Ticket purchase for Game ID: ' . $gameId,
+            'type'       => 'debit', // or 'purchase' depending on your type values
+        ]);
 
         return response()->json([
             'status' => 'success',
