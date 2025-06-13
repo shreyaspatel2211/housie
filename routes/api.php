@@ -40,8 +40,7 @@ Route::get('/game-winners/{id}', function ($id) {
     ]);
 });
 
-Route::get('/games', [GameController::class, 'index']);
-// get all the games
+Route::get('/games', [GameController::class, 'index']);             // get all the games
 
 Route::get('/games/today', [GameController::class, 'getTodayGames']);    // get all the games of today
 
@@ -86,5 +85,8 @@ Route::post('/game-data', [GameWinnersController::class, 'getGameData']);
 Route::post('/deposit', [DepositController::class, 'store']);
 
 Route::post('/withdraw', [WithdrawalController::class, 'store']);
+
 Route::get('/game-winners-top/{game_id}', [GameWinnersController::class, 'getWinners']);
+
+
 
