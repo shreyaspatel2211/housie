@@ -15,6 +15,7 @@ use App\Http\Controllers\GameWinnersController;
 use App\Http\Controllers\GameUserController;
 use App\Http\Controllers\DepositController;
 use App\Http\Controllers\WithdrawalController;
+use App\Http\Controllers\TransactionController;
 
 
 /*
@@ -88,5 +89,8 @@ Route::post('/withdraw', [WithdrawalController::class, 'store']);
 
 Route::get('/game-winners-top/{game_id}', [GameWinnersController::class, 'getWinners']);
 
+Route::get('/transactions', [TransactionController::class, 'fetchAll']);
+
+Route::get('/user/transactions', [TransactionController::class, 'userTransactions']);
 
 

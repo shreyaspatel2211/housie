@@ -9,15 +9,8 @@ class Transaction extends Model
 {
     use HasFactory;
 
-    // Allow mass assignment for these fields
-    protected $fillable = [
-        'user_id',
-        'amount',
-        'description',
-        'type',
-    ];
+    protected $fillable = ['user_id', 'amount', 'description', 'type'];
 
-    // Optional: Define relationship to User
     public function user()
     {
         return $this->belongsTo(User::class);
