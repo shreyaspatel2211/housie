@@ -93,4 +93,7 @@ Route::get('/transactions', [TransactionController::class, 'fetchAll']);
 
 Route::get('/user/transactions', [TransactionController::class, 'userTransactions']);
 
+Route::post('/generate-number', [GameController::class, 'generateNextNumber']);
 
+// Route::get('/games/view/{id}', [GameController::class, 'view'])->name('admin.games.view');
+Route::post('/admin/games/push-number/{id}', [GameController::class, 'pushNumber'])->name('admin.games.pushNumber');

@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use TCG\Voyager\Facades\Voyager;
 use App\Http\Controllers\HousieGameController;
+use App\Http\Controllers\GameController;
 
 /*
 |--------------------------------------------------------------------------
@@ -32,3 +33,4 @@ Route::get('/login', function () {
     return 'Login page placeholder.';
 })->name('login');   // dummy login route
 
+Route::get('/admin/games/view/{id}', [GameController::class, 'view'])->name('admin.games.view');
