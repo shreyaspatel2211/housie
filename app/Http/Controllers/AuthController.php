@@ -268,4 +268,67 @@ class AuthController extends Controller
             }
         }
     }
+
+    public function addDeviceToken(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'device_token' => 'required|string',
+        ]);
+
+        // if ($validator->fails()) {
+        //     return response()->json([
+        //         'status' => 'error',
+        //         'message' => 'Validation failed',
+        //         'errors' => $validator->errors()
+        //     ], 422);
+        // }
+
+        if ($validator->fails()) {
+            $firstErrorMessage = $validator->errors()->first();
+    
+            return response()->json([
+                'status' => 'error',
+                'message' => $firstErrorMessage
+            ], 422);
+        }
+
+        $user = JWTAuth::parseToken()->authenticate();
+
+        if (!$user) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'User not found',
+            ], 404);
+        }
+
+        $user->device_token = $request->input('device_token');
+        $user->save();
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Device token added successfully',
+            'data' => $user
+        ]);
+    }
+
+    public function removeDeviceToken(Request $request)
+    {
+        $user = JWTAuth::user();
+
+        if (!$user->device_token) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Device token not found'
+            ], 404);
+        }
+        
+        $user->device_token = null;
+        $user->save();
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Device token removed successfully',
+            'data' => $user
+        ]);
+    }
 }

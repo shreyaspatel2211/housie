@@ -105,7 +105,6 @@ class GameController extends Controller
         return response()->json(['next' => $nextNumber]);
     }
 
-
     public function view($id)
     {
         $game = Game::findOrFail($id);
@@ -135,6 +134,31 @@ class GameController extends Controller
         broadcast(new NumberGenerated($number, $id))->toOthers();
 
         return back()->with('success', "Number $number pushed successfully");
+    }
+
+    public function autoPushNumber($id)
+    {
+        $game = Game::findOrFail($id);
+        $queue = json_decode($game->queue, true) ?? [];
+
+        $all = range(1, 89);
+        $remaining = array_values(array_diff($all, $queue));
+
+        if (count($remaining) === 0) {
+            return response()->json(['message' => 'All numbers pushed'], 200);
+        }
+
+        // Pick a random number
+        $randomNumber = $remaining[array_rand($remaining)];
+
+        // Push to queue
+        $queue[] = $randomNumber;
+        $game->queue = json_encode($queue);
+        $game->save();
+
+        broadcast(new NumberGenerated($randomNumber, $id))->toOthers();
+
+        return response()->json(['message' => "Number $randomNumber auto-pushed"], 200);
     }
 
 }

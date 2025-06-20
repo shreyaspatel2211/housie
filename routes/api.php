@@ -16,6 +16,7 @@ use App\Http\Controllers\GameUserController;
 use App\Http\Controllers\DepositController;
 use App\Http\Controllers\WithdrawalController;
 use App\Http\Controllers\TransactionController;
+use App\Http\Controllers\NotificationController;
 
 
 /*
@@ -97,3 +98,10 @@ Route::post('/generate-number', [GameController::class, 'generateNextNumber']);
 
 // Route::get('/games/view/{id}', [GameController::class, 'view'])->name('admin.games.view');
 Route::post('/admin/games/push-number/{id}', [GameController::class, 'pushNumber'])->name('admin.games.pushNumber');
+
+Route::post('/add-device-token', [AuthController::class, 'addDeviceToken']);
+
+Route::post('/remove-device-token', [AuthController::class, 'removeDeviceToken']);
+
+Route::get('/notifications', [NotificationController::class, 'userNotifications']);
+Route::post('/notifications/read', [NotificationController::class, 'markAsRead']);

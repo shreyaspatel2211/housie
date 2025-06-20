@@ -24,3 +24,30 @@
     </form>
 </div>
 @endsection
+
+<script>
+    let intervalId = null;
+    let gameId = {{ $game->id }};
+
+    function startAutoPush() {
+        intervalId = setInterval(() => {
+            fetch(`/admin/games/auto-push/${gameId}`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log(data.message);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }, 3000); // 10 seconds
+    }
+
+    // Call this on page load if needed, or after a delay
+    startAutoPush();
+</script>
+
