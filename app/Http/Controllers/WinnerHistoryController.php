@@ -28,7 +28,7 @@ class WinnerHistoryController extends Controller
                 'message' => 'User not authenticated'], 401);
         }
 
-        $winners = WinnerHistory::all();
+        $winners = WinnerHistory::with(['user', 'game'])->get();
         return response()->json([
             'status' => true,
             'data' => $winners

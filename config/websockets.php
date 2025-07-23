@@ -68,7 +68,7 @@ return [
             'host' => env('PUSHER_APP_HOST'),
             'key' => env('PUSHER_APP_KEY'),
             'secret' => env('PUSHER_APP_SECRET'),
-            'path' => env('PUSHER_APP_PATH'),
+            'path' => '/app/local',
             'capacity' => null,
             'enable_client_messages' => false,
             'enable_statistics' => true,

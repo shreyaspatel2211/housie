@@ -16,6 +16,7 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule)
     {
         $schedule->command('notify:upcoming-games')->everyTenMinutes();
+        $schedule->command('update:winner-amounts')->dailyAt('23:59');
     }
 
     /**

@@ -106,7 +106,6 @@ class AuthController extends Controller
         ]);
     }
 
-
     public function updatePassword(Request $request)
     {
         // Attempt to parse and authenticate user via JWT token

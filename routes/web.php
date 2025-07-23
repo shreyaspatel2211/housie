@@ -36,3 +36,7 @@ Route::get('/login', function () {
 Route::get('/admin/games/view/{id}', [GameController::class, 'view'])->name('admin.games.view');
 Route::get('/admin/notifications/push', [App\Http\Controllers\Admin\NotificationController::class, 'push'])->name('voyager.notifications.push');
 Route::post('/admin/games/auto-push/{id}', [GameController::class, 'autoPushNumber'])->name('admin.games.autoPush');
+
+Route::get('/game/viewtest', [GameController::class, 'viewTest'])->name('game.viewTest');
+
+Route::get('/trigger-autopush/{id}', [GameController::class, 'triggerAutoPush']);

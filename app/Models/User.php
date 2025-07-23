@@ -24,6 +24,7 @@ class User extends VoyagerUser implements JWTSubject
         'email',
         'phone_no',
         'password',
+        'theme',
     ];
 
     /**

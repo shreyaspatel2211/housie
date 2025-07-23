@@ -48,6 +48,8 @@ Route::get('/games/today', [GameController::class, 'getTodayGames']);    // get 
 
 Route::get('/games/{id}', [GameController::class, 'show']);              // get the game by game id
 
+Route::get('/active-user-games', [GameController::class, 'getActiveGamesForUser']);       // get all the active games for the authenticated user
+
 Route::get('/tickets', [TicketController::class, 'index']);              // get all the tickets
 
 Route::middleware('jwt.auth')->get('/tickets', [TicketController::class, 'getTicketsByUser']);      // it will give the tickets of the user by giving user id
@@ -96,6 +98,8 @@ Route::get('/user/transactions', [TransactionController::class, 'userTransaction
 
 Route::post('/generate-number', [GameController::class, 'generateNextNumber']);
 
+Route::post('/autopush/{id}', [GameController::class, 'autoPushNumber']);
+
 // Route::get('/games/view/{id}', [GameController::class, 'view'])->name('admin.games.view');
 Route::post('/admin/games/push-number/{id}', [GameController::class, 'pushNumber'])->name('admin.games.pushNumber');
 
@@ -105,3 +109,5 @@ Route::post('/remove-device-token', [AuthController::class, 'removeDeviceToken']
 
 Route::get('/notifications', [NotificationController::class, 'userNotifications']);
 Route::post('/notifications/read', [NotificationController::class, 'markAsRead']);
+
+Route::post('/set-theme', [GameController::class, 'storeTheme']);

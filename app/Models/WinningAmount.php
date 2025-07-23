@@ -8,4 +8,10 @@ use Illuminate\Database\Eloquent\Model;
 class WinningAmount extends Model
 {
     use HasFactory;
+    
+    public function game()
+    {
+        return $this->belongsTo(Game::class, 'game_id');
+    }
+    
 }
