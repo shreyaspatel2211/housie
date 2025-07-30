@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use TCG\Voyager\Facades\Voyager;
 use App\Http\Controllers\HousieGameController;
 use App\Http\Controllers\GameController;
+use App\Http\Controllers\AuthController;
 
 /*
 |--------------------------------------------------------------------------
@@ -18,7 +19,7 @@ use App\Http\Controllers\GameController;
 
 Route::get('/', function () {
     return view('welcome');
-});
+})->name('home');
 
 
 Route::group(['prefix' => 'admin'], function () {
@@ -40,3 +41,6 @@ Route::post('/admin/games/auto-push/{id}', [GameController::class, 'autoPushNumb
 Route::get('/game/viewtest', [GameController::class, 'viewTest'])->name('game.viewTest');
 
 Route::get('/trigger-autopush/{id}', [GameController::class, 'triggerAutoPush']);
+
+Route::get('auth/facebook', [AuthController::class, 'redirect'])->name('facebook.redirect');        
+Route::get('auth/facebook/callback', [AuthController::class, 'callback'])->name('facebook.callback');

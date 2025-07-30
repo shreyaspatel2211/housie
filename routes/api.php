@@ -20,6 +20,7 @@ use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\CustomAdsController;
 
 
+
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -120,3 +121,5 @@ Route::post('/notifications/read', [NotificationController::class, 'markAsRead']
 Route::post('/set-theme', [GameController::class, 'storeTheme']);
 
 Route::get('/trigger-autopush/{id}', [GameController::class, 'triggerAutoPush']);
+
+

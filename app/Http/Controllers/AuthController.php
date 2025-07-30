@@ -12,6 +12,8 @@ use Illuminate\Support\Facades\Auth;
 use Exception;
 use Tymon\JWTAuth\Exceptions\JWTException;
 use App\Helpers\FirebaseHelper;
+use Illuminate\Support\Str;
+use Laravel\Socialite\Facades\Socialite;
 
 class AuthController extends Controller
 {
@@ -378,6 +380,51 @@ class AuthController extends Controller
             'status' => 'success',
             'message' => 'Device token removed successfully',
             'data' => $user
+        ]);
+    }
+
+    public function redirect()
+    {
+        return Socialite::driver('facebook')->redirect();
+    }
+
+    public function callback()
+    {
+        $facebookUser = Socialite::driver('facebook')->stateless()->user();
+
+        // Find user by email or create
+        $user = User::where('email', $facebookUser->email)->first();
+
+        if (!$user) {
+            $user = User::create([
+                'name' => $facebookUser->name ?? 'Facebook User',
+                'email' => $facebookUser->email ?? $facebookUser->id . '@facebook.com',
+                'password' => bcrypt(str()->random(16)),
+                'verification_status' => 'Y', // Optional: Mark as verified since FB login
+            ]);
+        }
+
+        try {
+            // 🔹 Generate JWT access token
+            $token = JWTAuth::fromUser($user);
+
+            // 🔹 Generate refresh token (1 week expiry)
+            $refreshToken = JWTAuth::fromUser($user, ['exp' => strtotime('+1 week')]);
+        } catch (JWTException $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Failed to create token.'
+            ], 500);
+        }
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Login successful',
+            'data' => [
+                'access_token' => $token,
+                'refresh_token' => $refreshToken,
+                'user' => $user
+            ]
         ]);
     }
 }
