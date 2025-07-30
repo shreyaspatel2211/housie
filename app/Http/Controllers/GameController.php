@@ -273,7 +273,7 @@ class GameController extends Controller
         $all = range(1, 89);
         $remaining = array_values(array_diff($all, $queue));
 
-        return view('socket_test', compact('game', 'queue', 'remaining'));
+        return view('socket-test-new', compact('game', 'queue', 'remaining'));
     }
 
 }

@@ -11,7 +11,7 @@ use Tymon\JWTAuth\Facades\JWTAuth;
 use Illuminate\Support\Facades\Auth;
 use Exception;
 use Tymon\JWTAuth\Exceptions\JWTException;
-
+use App\Helpers\FirebaseHelper;
 
 class AuthController extends Controller
 {
@@ -102,6 +102,56 @@ class AuthController extends Controller
                 'access_token' => $token,
                 'refresh_token' => $refreshToken,
                 'user' => auth()->user()
+            ]
+        ]);
+    }
+
+    public function firebaseLogin(Request $request)
+    {
+        $request->validate([
+            'idToken' => 'required|string'
+        ]);
+
+        $firebaseUser = FirebaseHelper::verifyIdToken($request->idToken);
+
+        if (!$firebaseUser) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Invalid Firebase ID token.'
+            ], 401);
+        }
+
+        $email = $firebaseUser['email'] ?? null;
+        $uid = $firebaseUser['sub'] ?? null;
+        $name = $firebaseUser['name'] ?? 'Firebase User';
+
+        if (!$email || !$uid) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Required user data missing in Firebase token.'
+            ], 422);
+        }
+
+        $user = User::firstOrCreate(
+            ['email' => $email],
+            [
+                'username' => Str::slug($name) . '-' . rand(1000, 9999),
+                'name' => $name,
+                'password' => bcrypt(Str::random(16)),
+                'verification_status' => 'Y', // Assuming Firebase-verified users are trusted
+            ]
+        );
+
+        $token = JWTAuth::fromUser($user);
+        $refreshToken = JWTAuth::fromUser($user, ['exp' => strtotime('+1 week')]);
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Login successful',
+            'data' => [
+                'access_token' => $token,
+                'refresh_token' => $refreshToken,
+                'user' => $user
             ]
         ]);
     }

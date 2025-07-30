@@ -90,7 +90,8 @@ class GameWinnersController extends Controller
     //     return response()->json($winners);
     // }
 
-    public function getWinners(Request $request, $game_id){
+    public function getWinners(Request $request, $game_id)
+    {
         $token = $request->header('Authorization');
 
         if (!$token) {
@@ -99,19 +100,58 @@ class GameWinnersController extends Controller
                 'message' => 'Token not provided'
             ], 401);
         }
+
         $user = JWTAuth::parseToken()->authenticate();
 
         if (!$user) {
             return response()->json([
                 'status' => 'error',
-                'message' => 'User not authenticated'], 401);
+                'message' => 'User not authenticated'
+            ], 401);
         }
 
-        $winners = WinnerHistory::where('game_id', $game_id)->with(['user', 'game'])->get();
+        // Fetch all winners sorted by created_at for ranking
+        $winners = WinnerHistory::where('game_id', $game_id)
+                    ->where('user_id', $user->id)
+                    ->with(['user', 'game'])
+                    ->orderBy('created_at')
+                    ->get();
+
+        $categories = ['early_five', 'first_row', 'second_row', 'third_row', 'full_house'];
+
+        foreach ($categories as $category) {
+            // Filter winners who won in this category
+            $categoryWinners = $winners->filter(function ($winner) use ($category) {
+                return $winner->$category == 1 || $winner->$category === '1';
+            })->values(); // reset keys
+
+            if ($categoryWinners->count() >= 1) {
+                foreach ($categoryWinners as $index => $winner) {
+                    // Initialize ranks if not already set
+                    $ranks = $winner->getAttribute('ranks') ?? [];
+                    $ranks[$category] = $index + 1; // rank starts from 1
+                    $winner->setAttribute('ranks', $ranks);
+                }
+            }
+        }
+
+        // Make sure ranks exists for all (even if empty)
+        foreach ($winners as $winner) {
+            if (!$winner->getAttribute('ranks')) {
+                $winner->setAttribute('ranks', (object)[]);
+            }
+        }
+
+        $winningAmounts = WinningAmount::where('game_id', $game_id)->first();
+        $amountData = $winningAmounts ? json_decode($winningAmounts->amount_json, true) : null;
+
         return response()->json([
             'status' => true,
-            'data' => $winners
+            'data' => $winners,
+            'winning_amounts' => $amountData
         ]);
     }
+
+
 
 }

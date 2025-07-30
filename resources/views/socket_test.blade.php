@@ -16,7 +16,7 @@
             wsHost: 'housie.vikartrtechnologies.com',
             wsPort: 6001,
             wssPort: 6001,
-            forceTLS: false, // true if using HTTPS
+            forceTLS: false, 
             encrypted: false,
             enabledTransports: ['ws', 'wss'],
             disableStats: true,
@@ -29,7 +29,7 @@
             console.log('Subscribed to channel game.23');
 
             // 🔥 Trigger backend to start pushing
-            fetch('/trigger-autopush/23')
+            fetch('/api/trigger-autopush/23')
                 .then(response => response.json())
                 .then(data => {
                     console.log('Auto push triggered:', data);

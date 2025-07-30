@@ -17,6 +17,7 @@ use App\Http\Controllers\DepositController;
 use App\Http\Controllers\WithdrawalController;
 use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\CustomAdsController;
 
 
 /*
@@ -42,6 +43,10 @@ Route::get('/game-winners/{id}', function ($id) {
     ]);
 });
 
+Route::get('/custome-ads', [CustomAdsController::class, 'index']);             // get all the games
+
+Route::get('/info-screen', [CustomAdsController::class, 'getInfoScreen']);
+
 Route::get('/games', [GameController::class, 'index']);             // get all the games
 
 Route::get('/games/today', [GameController::class, 'getTodayGames']);    // get all the games of today
@@ -59,6 +64,8 @@ Route::get('/tickets/{id}', [TicketController::class, 'show']);          // get 
 Route::post('/register', [AuthController::class, 'register']);
 
 Route::post('/login', [AuthController::class, 'login']);
+
+Route::post('/firebase-login', [AuthController::class, 'firebaseLogin']);
 
 Route::middleware('auth:api')->post('/update-password', [\App\Http\Controllers\AuthController::class, 'updatePassword']);
 
@@ -111,3 +118,5 @@ Route::get('/notifications', [NotificationController::class, 'userNotifications'
 Route::post('/notifications/read', [NotificationController::class, 'markAsRead']);
 
 Route::post('/set-theme', [GameController::class, 'storeTheme']);
+
+Route::get('/trigger-autopush/{id}', [GameController::class, 'triggerAutoPush']);
