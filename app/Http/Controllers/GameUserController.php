@@ -50,8 +50,9 @@ class GameUserController extends Controller
             'no_of_tickets' => $ticketCount,
         ]);
 
-        // Deduct balance and save
+        // Deduct balance and Increment total_games count
         $user->balance -= $totalAmount;
+        $user->total_games += 1;
         $user->save();
 
         // Save transaction
